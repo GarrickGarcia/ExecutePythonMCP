@@ -1,5 +1,6 @@
 import os
 import subprocess
+import datetime
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
@@ -18,7 +19,7 @@ def execute_python(file_path: str, interpreter_path: str = None) -> str:
                          Defaults to the ArcGIS Pro Python environment.
     
     Returns:
-        The complete terminal output including prints, errors, and tracebacks.
+        The path to the output file containing the execution results.
     """
     try:
         # Validate the Python file exists
@@ -36,33 +37,42 @@ def execute_python(file_path: str, interpreter_path: str = None) -> str:
         if not Path(python_exe).exists():
             return f"Error: Python interpreter not found at {python_exe}"
         
-        # Execute the script with timeout and unbuffered output
-        result = subprocess.run(
-            [python_exe, "-u", str(script_path)],  # -u for unbuffered output
-            capture_output=True,
-            text=True,
-            cwd=script_path.parent,  # Set working directory to script's directory
-            timeout=30  # 30 second timeout
-        )
+        # Create output file path
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = script_path.parent / f"{script_path.stem}_output_{timestamp}.txt"
         
-        # Combine stdout and stderr for complete output
-        output = ""
+        # Execute the script with output redirected to file
+        with open(output_file, 'w') as outfile:
+            # Write header
+            outfile.write(f"=== Executing: {script_path.name} ===\n")
+            outfile.write(f"Time: {datetime.datetime.now()}\n")
+            outfile.write(f"Interpreter: {python_exe}\n")
+            outfile.write("="*50 + "\n\n")
+            outfile.flush()
+            
+            # Execute script
+            try:
+                result = subprocess.run(
+                    [python_exe, str(script_path)],
+                    stdout=outfile,
+                    stderr=subprocess.STDOUT,  # Combine stderr with stdout
+                    cwd=script_path.parent,
+                    timeout=30
+                )
+                
+                # Write footer
+                outfile.write(f"\n\n" + "="*50 + "\n")
+                outfile.write(f"Exit code: {result.returncode}\n")
+                outfile.write(f"Completed at: {datetime.datetime.now()}\n")
+                
+            except subprocess.TimeoutExpired:
+                outfile.write(f"\n\n" + "="*50 + "\n")
+                outfile.write("ERROR: Script execution timed out after 30 seconds\n")
+                return f"Error: Script timed out. Partial output saved to: {output_file}"
         
-        if result.stdout:
-            output += result.stdout
+        # Return the path to the output file
+        return f"Script executed successfully. Output saved to: {output_file}"
         
-        if result.stderr:
-            if output:
-                output += "\n"
-            output += result.stderr
-        
-        if not output:
-            output = "Script executed successfully with no output."
-        
-        return output
-        
-    except subprocess.TimeoutExpired:
-        return "Error: Script execution timed out after 30 seconds"
     except Exception as e:
         return f"Error executing script: {str(e)}"
 

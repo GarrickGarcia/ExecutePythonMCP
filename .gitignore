@@ -55,3 +55,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Output files
+*_output_*.txt

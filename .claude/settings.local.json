@@ -3,7 +3,11 @@
     "allow": [
       "Bash(find:*)",
       "Bash(uv venv:*)",
-      "Bash(uv pip install:*)"
+      "Bash(uv pip install:*)",
+      "Bash(mv:*)",
+      "Bash(del test_output.txt)",
+      "Bash(rm:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }
