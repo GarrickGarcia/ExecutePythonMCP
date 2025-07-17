@@ -36,12 +36,13 @@ def execute_python(file_path: str, interpreter_path: str = None) -> str:
         if not Path(python_exe).exists():
             return f"Error: Python interpreter not found at {python_exe}"
         
-        # Execute the script
+        # Execute the script with timeout and unbuffered output
         result = subprocess.run(
-            [python_exe, str(script_path)],
+            [python_exe, "-u", str(script_path)],  # -u for unbuffered output
             capture_output=True,
             text=True,
-            cwd=script_path.parent  # Set working directory to script's directory
+            cwd=script_path.parent,  # Set working directory to script's directory
+            timeout=30  # 30 second timeout
         )
         
         # Combine stdout and stderr for complete output
@@ -60,6 +61,8 @@ def execute_python(file_path: str, interpreter_path: str = None) -> str:
         
         return output
         
+    except subprocess.TimeoutExpired:
+        return "Error: Script execution timed out after 30 seconds"
     except Exception as e:
         return f"Error executing script: {str(e)}"
 
