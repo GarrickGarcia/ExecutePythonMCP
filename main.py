@@ -36,15 +36,12 @@ def execute_python(file_path: str, interpreter_path: str = None) -> str:
         if not Path(python_exe).exists():
             return f"Error: Python interpreter not found at {python_exe}"
         
-        # Execute the script with UTF-8 encoding
+        # Execute the script
         result = subprocess.run(
             [python_exe, str(script_path)],
             capture_output=True,
             text=True,
-            encoding='utf-8',
-            errors='replace',  # Replace undecodable characters instead of failing
-            cwd=script_path.parent,  # Set working directory to script's directory
-            env={**os.environ, 'PYTHONIOENCODING': 'utf-8'}  # Force UTF-8 for Python I/O
+            cwd=script_path.parent  # Set working directory to script's directory
         )
         
         # Combine stdout and stderr for complete output

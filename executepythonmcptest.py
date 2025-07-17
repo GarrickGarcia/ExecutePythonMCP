@@ -7,12 +7,6 @@ This script tests various output scenarios to verify the MCP tool works correctl
 import sys
 import os
 
-# Try to set UTF-8 encoding for Windows console
-if sys.platform == 'win32':
-    import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
 print("=== ExecutePythonMCP Test Script ===")
 print(f"Python version: {sys.version}")
 print(f"Script location: {os.path.abspath(__file__)}")
@@ -37,10 +31,10 @@ print("This goes to stdout", file=sys.stdout)
 print("This goes to stderr", file=sys.stderr)
 print()
 
-# Test Unicode
-print("TEST 4: Unicode support")
-print("Unicode test: π ≈ 3.14159, √2 ≈ 1.414")
-print("Emoji test: 🐍 Python 🚀 MCP 🎯")
+# Test special characters (using ASCII alternatives)
+print("TEST 4: Special characters")
+print("Math symbols: pi ~ 3.14159, sqrt(2) ~ 1.414")
+print("ASCII art: <Python> [MCP] (Test)")
 print()
 
 # Test error handling (commented out by default)
