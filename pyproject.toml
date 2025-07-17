@@ -1,0 +1,10 @@
+[project]
+name = "executepythonmcp"
+version = "0.1.0"
+description = "MCP server to execute Python scripts with local interpreters"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.9.3",
+    "fastmcp>=0.1.0",
+]
